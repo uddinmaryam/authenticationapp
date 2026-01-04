@@ -4,10 +4,11 @@ export interface Message extends Document {
   content: string;
   createdAt: Date;
 }
-//schema
+
+
 const MessageSchema: Schema<Message> = new Schema({
   content: {
-    type: String, //capital as it accepts String not string
+    type: String,
     required: true,
   },
 
@@ -22,10 +23,13 @@ export interface User extends Document {
   username: string;
   email: string;
   password: string;
+
   verifyCode: string;
-  verifyCodeExpiry: string;
-  isVerifyingMessage: boolean;
-  isAcceptingMessage: boolean;
+  verifyCodeExpiry: Date;
+
+  isVerified: boolean;
+  isAcceptingMessages: boolean;
+
   messages: Message[];
 }
 
@@ -36,32 +40,48 @@ const UserSchema: Schema<User> = new Schema({
     trim: true,
     unique: true,
   },
+
   email: {
     type: String,
     required: [true, "Email is required"],
+    unique: true,
+    trim: true,
+    lowercase: true,
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please enter a valid email address"],
   },
+
   password: {
     type: String,
     required: [true, "Password is required"],
   },
+
   verifyCode: {
     type: String,
-    required: [true, "verify code  is required"],
+    required: [true, "Verify code is required"],
   },
+
+  //  Must be Date (because you set: new Date(Date.now() + 3600000))
   verifyCodeExpiry: {
-    type: String,
-    required: [true, "verify expiry code  is required"],
+    type: Date,
+    required: [true, "Verify code expiry is required"],
   },
-  isVerifyingMessage: {
+
+  // This is what your route checks (isVerified: true/false)
+  isVerified: {
     type: Boolean,
     default: false,
   },
-  isAcceptingMessage: {
+
+  // This is what your route sets (isAcceptingMessages: true)
+  isAcceptingMessages: {
     type: Boolean,
     default: true,
   },
-  messages: [MessageSchema],
+
+  messages: {
+    type: [MessageSchema],
+    default: [],
+  },
 });
 
 const UserModel =
