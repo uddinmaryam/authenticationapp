@@ -23,30 +23,30 @@ export const authOptions: NextAuthOptions = {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       async authorize(credentials: any): Promise<any> {
-        await dbConnect();
+        await dbConnect(); //connect to the database
 
         try {
           const user = await UserModel.findOne({
-            $or: [
+            $or: [ //mongo db operator
               { email: credentials.identifier },
               { username: credentials.identifier },
             ],
           });
 
-          if (!user) {
+          if (!user) { //for user
             throw new Error("no user found with this mail");
           }
 
-          if (!user.isVerified) {
+          if (!user.isVerified) { //for verified user
             throw new Error("please verify your acc first");
           }
 
-          const isPasswordCorrect = await bcrypt.compare(
+          const isPasswordCorrect = await bcrypt.compare( //password hashing if new
             credentials.password,
             user.password
           );
 
-          if (isPasswordCorrect) {
+          if (isPasswordCorrect) { //incorrect password
             return user;
           } else {
             throw new Error("invalid password");
@@ -58,8 +58,8 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
+  callbacks: { //hooks that let you control what data flows into the pipeline
+    async jwt({ token, user }) { 
       if (user) {
         token._id = user._id?.toString();
         token._isVerified = user.isVerified;
