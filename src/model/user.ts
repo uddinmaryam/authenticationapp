@@ -72,7 +72,7 @@ const UserSchema: Schema<User> = new Schema({
     default: false,
   },
 
-  // This is what your route sets (isAcceptingMessages: true)
+  // ✅This is what your route sets (isAcceptingMessages: true)
   isAcceptingMessages: {
     type: Boolean,
     default: true,
